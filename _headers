@@ -1,0 +1,6 @@
+# Always revalidate the service worker and HTML so updates propagate immediately.
+# Versioned asset URLs (?v=N) handle cache-busting for css/js.
+/sw.js
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache

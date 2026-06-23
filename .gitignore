@@ -1,0 +1,9 @@
+# OS / editor
+.DS_Store
+
+# Cloudflare Wrangler local state
+.wrangler/
+
+# Local backups
+*.bak
+*.bak-*

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0c120f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>geo7</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%230d4f3c'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='monospace'>7</text></svg>">
+
+  <!-- Fonts: Nunito (UI) + Space Mono (codes/links) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/style.css?v=104">
+</head>
+<body>
+  <div id="app">
+    <!-- Map fills the screen -->
+    <div id="map"></div>
+
+    <!-- Top chrome: search/address bar (left) + recenter (right) -->
+    <div id="top-chrome">
+      <div class="search-bar">
+        <span class="wordmark-badge" title="geo7">7</span>
+        <input id="address-input" type="text" placeholder="Search a place or tap the map" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search a place or address">
+        <button id="address-clear" class="address-clear" type="button" aria-label="Clear search" hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="chrome-actions">
+        <button id="layer-toggle" class="chrome-btn" aria-label="Toggle map / satellite" title="Map / satellite">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+        </button>
+        <button id="recenter-btn" class="chrome-btn" aria-label="Recenter on the pin" title="Recenter">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="search-results" class="search-results" aria-label="Search results" hidden></div>
+
+    <!-- ============ BOTTOM SHEET ============ -->
+    <div id="sheet">
+      <div class="grab-handle"></div>
+
+      <!-- STATE: RESOLVED — recipient arrived via link -->
+      <section id="view-resolved" class="view" hidden>
+        <div class="sheet-top-row">
+          <span class="kicker kicker-green">Shared with you</span>
+          <button class="close-x" data-action="clear" aria-label="Close" title="Close">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <h1 id="res-title" class="place-title"></h1>
+        <div id="res-region" class="place-region"></div>
+        <div id="res-note" class="note-callout" hidden>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#167a5e" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+          <span id="res-note-text"></span>
+        </div>
+        <div class="code-line code-line-lg">
+          <span class="code-prefix" data-code-prefix>CR</span><span class="code-slash">/</span><span class="code-body" id="res-code"></span>
+        </div>
+        <div id="res-precision" class="precision-line"></div>
+        <button class="btn-primary" data-action="get-directions">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 12 13 3v5C6 8 2 13 2 21c2.5-4 6-5 11-5v5l9-9Z"/></svg>
+          Get directions
+        </button>
+        <div class="btn-caption">Opens in Google Maps or Waze — no app needed</div>
+      </section>
+
+      <!-- STATE: OFFLINE — degraded but usable -->
+      <section id="view-offline" class="view" hidden>
+        <div class="sheet-top-row">
+          <span class="kicker kicker-dim">Location ready · offline</span>
+          <button class="close-x" data-action="clear" aria-label="Close" title="Close">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="code-line code-line-xl">
+          <span class="code-prefix" data-code-prefix>CR</span><span class="code-slash">/</span><span class="code-body" id="off-code"></span>
+        </div>
+        <div id="off-explainer" class="explainer-line"></div>
+        <button class="btn-primary" data-action="get-directions">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 12 13 3v5C6 8 2 13 2 21c2.5-4 6-5 11-5v5l9-9Z"/></svg>
+          Get directions
+        </button>
+      </section>
+
+      <!-- STATE: NOT FOUND — broken / expired / unsupported -->
+      <section id="view-notfound" class="view" hidden>
+        <div class="notfound-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        </div>
+        <div class="notfound-title">We couldn't open that link</div>
+        <div class="notfound-detail">The code may be mistyped, expired, or outside a supported area. Double-check it with whoever shared it.</div>
+        <button class="btn-primary btn-primary-sm" data-action="open-entry">Enter a code manually</button>
+        <button class="btn-text" data-action="share-mine">Or share my own location</button>
+      </section>
+
+      <!-- STATE: EMPTY — cold open, manual entry fallback -->
+      <section id="view-empty" class="view" hidden>
+        <button class="launcher" data-action="open-entry">
+          <span class="code-prefix" data-code-prefix>CR</span>
+          <span class="code-slash">/</span>
+          <span class="launcher-placeholder">Enter a code</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5e6a64" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg>
+        </button>
+        <div class="helper-line">Most geo7 links open straight to the place. Type a code here if you got it on a sign, a card, or by phone.</div>
+        <div class="or-divider"><span class="or-rule"></span><span class="or-label">OR</span><span class="or-rule"></span></div>
+        <button class="btn-secondary" data-action="share-mine">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.4 8 12 8 12s8-6.6 8-12a8 8 0 0 0-8-8Z"/></svg>
+          Share my location as a code
+        </button>
+      </section>
+
+      <!-- STATE: MINE — generator -->
+      <section id="view-mine" class="view" hidden>
+        <div class="sheet-top-row">
+          <span class="kicker kicker-dim gps-kicker">
+            <span class="gps-dot"></span>
+            Your current location
+          </span>
+          <button class="close-x" data-action="clear" aria-label="Close" title="Close">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="code-line code-line-2xl">
+          <span class="code-prefix" data-code-prefix>CR</span><span class="code-slash">/</span><span class="code-body" id="mine-code"></span>
+        </div>
+        <div id="mine-meta" class="place-region"></div>
+
+        <div id="mine-note-manager" class="note-manager"></div>
+
+        <div class="link-field">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5e6a64" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+          <span id="mine-link" class="link-text"></span>
+        </div>
+        <div class="btn-caption btn-caption-left">Send the link — it opens the place in any browser, no app required.</div>
+
+        <button class="btn-primary" data-action="share-link">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6 12 2 8 6"/><path d="M12 2v14"/></svg>
+          Share link
+        </button>
+        <div class="btn-grid-2">
+          <button class="btn-secondary btn-secondary-sm" data-action="copy-link">Copy link</button>
+          <button class="btn-secondary btn-secondary-sm" data-action="copy-code">Copy code</button>
+        </div>
+
+        <div id="install-nudge" class="install-nudge" hidden>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+          <span class="install-text">Share spots often? Add geo7 to your home screen.</span>
+          <button class="install-add" data-action="install">Add</button>
+          <button class="install-dismiss" data-action="dismiss-install" aria-label="Dismiss">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </section>
+      <!-- STATE: SELECTED — a point tapped on the map or chosen from search -->
+      <section id="view-selected" class="view" hidden>
+        <div class="sheet-top-row">
+          <span class="kicker kicker-dim" id="sel-kicker">Dropped pin</span>
+          <button class="close-x" data-action="clear" aria-label="Close" title="Close">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <h1 id="sel-title" class="place-title"></h1>
+        <div id="sel-region" class="place-region"></div>
+        <div class="code-line code-line-lg">
+          <span class="code-prefix" data-code-prefix>CR</span><span class="code-slash">/</span><span class="code-body" id="sel-code"></span>
+        </div>
+        <div id="sel-precision" class="precision-line"></div>
+        <button class="btn-primary" data-action="get-directions">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 12 13 3v5C6 8 2 13 2 21c2.5-4 6-5 11-5v5l9-9Z"/></svg>
+          Get directions
+        </button>
+        <div id="sel-note-manager" class="note-manager"></div>
+        <div class="btn-grid-2">
+          <button class="btn-secondary btn-secondary-sm" data-action="share-selected">Share</button>
+          <button class="btn-secondary btn-secondary-sm" data-action="copy-code-selected">Copy code</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right-click context menu (Google-Maps style) -->
+    <div id="context-menu" class="context-menu" hidden></div>
+
+    <!-- ============ CODE ENTRY OVERLAY ============ -->
+    <div id="entry-overlay" class="overlay" hidden>
+      <div class="overlay-backdrop" data-action="close-entry"></div>
+      <div class="overlay-panel">
+        <div class="grab-handle"></div>
+        <div class="kicker kicker-dim entry-kicker">Enter a geo7 code</div>
+        <label class="entry-region-row">Region
+          <select id="entry-region" class="entry-region" aria-label="Region"></select>
+        </label>
+        <div id="entry-input-row" class="entry-input-row">
+          <span class="code-prefix" data-code-prefix>CR</span>
+          <span class="code-slash">/</span>
+          <input id="code-input" type="text" inputmode="latin" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="k3n8p2" maxlength="6">
+        </div>
+        <div id="entry-error" class="entry-error" hidden></div>
+        <div id="entry-helper" class="entry-helper">Type the 6 characters from the code you were sent.</div>
+      </div>
+    </div>
+
+    <!-- ============ HANDOFF OVERLAY ============ -->
+    <div id="handoff-overlay" class="overlay" hidden>
+      <div class="overlay-backdrop" data-action="close-handoff"></div>
+      <div class="overlay-panel">
+        <div class="grab-handle"></div>
+        <div class="handoff-title">Open directions in…</div>
+
+        <div class="dest-chip">
+          <span class="dest-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#072e22" stroke-width="2.6"><circle cx="12" cy="10" r="2.5"/><path d="M12 2a8 8 0 0 0-8 8c0 5.4 8 12 8 12s8-6.6 8-12a8 8 0 0 0-8-8Z"/></svg>
+          </span>
+          <div class="dest-text">
+            <div id="handoff-title-text" class="dest-title"></div>
+            <div id="handoff-code-text" class="dest-code"></div>
+          </div>
+        </div>
+
+        <div class="provider-grid">
+          <button class="provider-card provider-card-default" data-action="pick-google">
+            <span class="provider-default-tag">Default</span>
+            <span class="provider-icon provider-icon-google">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.2"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.5" fill="#1a73e8" stroke="none"/></svg>
+            </span>
+            <span class="provider-label">Google Maps</span>
+          </button>
+          <button class="provider-card" data-action="pick-waze">
+            <span class="provider-icon provider-icon-waze">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0b1f2a" stroke-width="2.2"><circle cx="12" cy="11" r="8"/><path d="M8 20l1.5 2M16 20l-1.5 2"/><circle cx="9.5" cy="10" r="1" fill="#0b1f2a" stroke="none"/><circle cx="14.5" cy="10" r="1" fill="#0b1f2a" stroke="none"/><path d="M9 14a4 4 0 0 0 6 0"/></svg>
+            </span>
+            <span class="provider-label">Waze</span>
+          </button>
+        </div>
+
+        <button class="btn-web-fallback" data-action="pick-web">Open in browser maps instead</button>
+
+        <button id="remember-toggle" class="remember-row" data-action="toggle-remember">
+          <span class="remember-box"><svg class="remember-check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4 10-11"/></svg></span>
+          <span class="remember-label">Always use this app on this phone</span>
+        </button>
+
+        <button class="btn-text btn-text-dismiss" data-action="close-handoff">Not now</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="js/app.js?v=104"></script>
+</body>
+</html>

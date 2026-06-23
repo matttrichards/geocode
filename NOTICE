@@ -1,0 +1,12 @@
+geo7
+Copyright 2026 Matt Richards
+
+This product includes software developed by Matt Richards, licensed under the
+Apache License, Version 2.0 (see LICENSE).
+
+The geo7 specification (docs/SPEC.md) and the region data (regions.v1.json,
+js/regions.gen.js) are dedicated to the public domain under CC0 1.0 Universal
+(see LICENSE-CC0).
+
+The region boxes are derived from Natural Earth (https://www.naturalearthdata.com),
+which is in the public domain.

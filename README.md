@@ -2,7 +2,7 @@
 You can play around with a simple UI I built for it here: https://geoloc.cc/
 Feel free to build your own UI!
 
-- **This is useful when:
+**This is useful when:
 
 A delivery driver who isn't from your barrio can't find you, so the package goes back.
 

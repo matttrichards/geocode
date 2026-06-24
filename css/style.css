@@ -122,6 +122,7 @@ html, body {
 }
 .chrome-btn:active { transform: scale(.96); }
 .chrome-btn.active { color: var(--amber); border-color: var(--amber); }
+.chrome-btn.lang-btn { font-family: var(--font-ui); font-weight: 800; font-size: 13px; letter-spacing: .5px; }
 .chrome-actions { display: flex; align-items: center; gap: 8px; }
 
 /* ── Bottom sheet ──────────────────────────────────────── */

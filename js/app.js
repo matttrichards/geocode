@@ -9,7 +9,8 @@
 import {
   encode, decode, estimatePrecision, detectCountry,
   getBBox, BBOXES, COUNTRY_NAMES, ALPHABET,
-} from "./codec.js?v=107";
+} from "./codec.js?v=108";
+import { t, getLang, setLang, applyStaticI18n } from "./i18n.js?v=108";
 
 /* ── Preferences (localStorage) ───────────────────────────── */
 const PREF_KEY = "geo7-prefs";
@@ -181,7 +182,7 @@ function coordsString(lat, lon) {
 async function reverseGeocodePlace(lat, lon) {
   const res = await fetch(
     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=18&addressdetails=1`,
-    { headers: { "Accept-Language": "en" } }
+    { headers: { "Accept-Language": getLang() } }
   );
   if (!res.ok) throw new Error("reverse geocode failed");
   const data = await res.json();
@@ -301,8 +302,7 @@ function renderResolved(loc) {
     noteEl.hidden = true;
   }
   const m = precisionMeters(loc.country);
-  $("#res-precision").textContent =
-    `Pinpoint · ~${m} m precision · ${loc.coords}`;
+  $("#res-precision").textContent = t("precision_full", { m, coords: loc.coords });
   setPin(loc.lat, loc.lon);
   showView("resolved");
 }
@@ -311,8 +311,7 @@ function renderOffline(loc) {
   state.location = loc;
   setCodePrefixes(loc.country);
   $("#off-code").textContent = loc.code;
-  $("#off-explainer").textContent =
-    `Couldn't load the place name, but the pin is exact (${loc.coords}). You can still get directions.`;
+  $("#off-explainer").textContent = t("offline_explainer", { coords: loc.coords });
   setPin(loc.lat, loc.lon);
   showView("offline");
 }
@@ -377,22 +376,22 @@ function renderMineLink() {
 
 async function enterGenerator() {
   if (!navigator.geolocation) {
-    showToast("Location isn't available on this device");
+    showToast(t("toast_loc_unavailable"));
     return;
   }
-  showToast("Locating you…");
+  showToast(t("toast_locating"));
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
       const country = detectCountry(lat, lon);
       if (!country) {
-        showToast("You're outside a supported area");
+        showToast(t("toast_outside_area"));
         return;
       }
       let enc;
       try { enc = encode(lat, lon, country); }
-      catch { showToast("Couldn't make a code here"); return; }
+      catch { showToast(t("toast_cant_code_here")); return; }
 
       mineState.lat = lat;
       mineState.lon = lon;
@@ -405,7 +404,7 @@ async function enterGenerator() {
       $("#mine-code").textContent = enc.code;
       mineNoteMgr?.reset();
       const m = precisionMeters(country);
-      $("#mine-meta").textContent = `~${m} m precision`;
+      $("#mine-meta").textContent = t("precision_meta", { m });
       renderMineLink();
       setPin(lat, lon);
       showView("mine");
@@ -415,11 +414,11 @@ async function enterGenerator() {
       try {
         const { title } = await reverseGeocodePlace(lat, lon);
         if (state.view === "mine" && title) {
-          $("#mine-meta").textContent = `${title} · ~${m} m precision`;
+          $("#mine-meta").textContent = t("precision_meta_title", { title, m });
         }
       } catch {}
     },
-    () => showToast("Enable location to share your spot"),
+    () => showToast(t("toast_enable_share")),
     { enableHighAccuracy: true, timeout: 8000 }
   );
 }
@@ -493,7 +492,7 @@ codeInput.addEventListener("input", (e) => {
   if (raw !== e.target.value) e.target.value = raw;
   const req = estimatePrecision(currentCountry)?.numChars || 6;
   if ([...raw].some((ch) => !ALPHABET.includes(ch))) {
-    setEntryError("That code has characters Geoloc doesn't use.");
+    setEntryError(t("entry_err_chars"));
     return;
   }
   setEntryError("");
@@ -503,7 +502,7 @@ codeInput.addEventListener("input", (e) => {
       closeEntry();
       resolveAndShow(resolved);
     } else {
-      setEntryError("That code isn't valid here. Check it and try again.");
+      setEntryError(t("entry_err_invalid"));
     }
   }
 });
@@ -518,7 +517,7 @@ function openHandoff() {
     return;
   }
   $("#handoff-title-text").textContent = loc.title || `${loc.country}/${loc.code}`;
-  $("#handoff-code-text").textContent = `${loc.country}/${loc.code} · destination set`;
+  $("#handoff-code-text").textContent = t("dest_set", { code: `${loc.country}/${loc.code}` });
   syncRememberUI();
   syncProviderDefault();
   handoffOverlay.hidden = false;
@@ -540,7 +539,7 @@ function syncProviderDefault() {
     if (!wazeTag) {
       wazeTag = document.createElement("span");
       wazeTag.className = "provider-default-tag";
-      wazeTag.textContent = "Default";
+      wazeTag.textContent = t("default");
       waze.prepend(wazeTag);
     }
     wazeTag.hidden = false;
@@ -559,9 +558,9 @@ function handoff(provider) {
   }
   closeHandoff();
   let url, label;
-  if (provider === "waze") { url = wazeUrl(loc.lat, loc.lon); label = "Opening Waze…"; }
-  else if (provider === "web") { url = webMapsUrl(loc.lat, loc.lon); label = "Opening maps in browser…"; }
-  else { url = googleDirectionsUrl(loc.lat, loc.lon); label = "Opening Google Maps…"; }
+  if (provider === "waze") { url = wazeUrl(loc.lat, loc.lon); label = t("toast_opening_waze"); }
+  else if (provider === "web") { url = webMapsUrl(loc.lat, loc.lon); label = t("toast_opening_web"); }
+  else { url = googleDirectionsUrl(loc.lat, loc.lon); label = t("toast_opening_google"); }
   showToast(label);
   location.href = url;
 }
@@ -588,11 +587,11 @@ async function shareMineLink() {
   const url = mineState.shareUrl;
   if (!url) return;
   if (navigator.share) {
-    try { await navigator.share({ title: "Geoloc location", url }); return; }
+    try { await navigator.share({ title: t("share_title"), url }); return; }
     catch { /* user cancelled or unsupported → fall through */ }
   }
   const ok = await copyText(url);
-  showToast(ok ? "Link copied" : "Couldn't copy link");
+  showToast(ok ? t("toast_link_copied") : t("toast_cant_copy_link"));
 }
 
 /* ── Toast ────────────────────────────────────────────────── */
@@ -629,20 +628,20 @@ async function shareCurrentPlace() {
   const url = currentShareUrl();
   if (!url) return;
   if (navigator.share) {
-    try { await navigator.share({ title: "Geoloc location", url }); return; }
+    try { await navigator.share({ title: t("share_title"), url }); return; }
     catch { /* cancelled / unsupported → fall through to copy */ }
   }
   const ok = await copyText(url);
-  showToast(ok ? "Link copied" : "Couldn't copy link");
+  showToast(ok ? t("toast_link_copied") : t("toast_cant_copy_link"));
 }
 
 // Select an arbitrary point: encode it, drop a pin, reverse-geocode, show it.
 async function selectPoint(lat, lon, { source = "map", fly = false } = {}) {
   const country = detectCountry(lat, lon);
-  if (!country) { showToast("That spot isn't in a supported area yet"); return; }
+  if (!country) { showToast(t("toast_spot_unsupported")); return; }
   let enc;
   try { enc = encode(lat, lon, country); }
-  catch { showToast("Couldn't make a code there"); return; }
+  catch { showToast(t("toast_cant_code_there")); return; }
 
   currentCountry = country;
   const loc = {
@@ -655,12 +654,12 @@ async function selectPoint(lat, lon, { source = "map", fly = false } = {}) {
   setCodePrefixes(country);
   $("#sel-code").textContent = enc.code;
   $("#sel-kicker").textContent =
-    source === "search" ? "Search result" : source === "gps" ? "Your location" : "Dropped pin";
+    source === "search" ? t("search_result") : source === "gps" ? t("your_location") : t("dropped_pin");
   $("#sel-title").textContent = loc.coords;
   $("#sel-title").hidden = false;
   $("#sel-region").hidden = true;
   $("#sel-precision").textContent =
-    `Pinpoint · ~${precisionMeters(country)} m precision · ${loc.coords}`;
+    t("precision_full", { m: precisionMeters(country), coords: loc.coords });
   setPin(lat, lon, { fly, zoom: Math.max(map.getZoom(), 15) });
   selNoteMgr?.reset();
   showView("selected");
@@ -685,10 +684,10 @@ function openContextMenu(lat, lon, x, y) {
   const menu = $("#context-menu");
   menu.innerHTML =
     `<button class="ctx-coords" data-ctx="copy-coords">${coordsString(lat, lon)}</button>` +
-    `<button class="ctx-item" data-ctx="whats-here">What's here?</button>` +
-    `<button class="ctx-item" data-ctx="directions">Directions to here</button>` +
-    `<button class="ctx-item" data-ctx="share">Share this location</button>` +
-    `<button class="ctx-item" data-ctx="copy-code">Copy code</button>`;
+    `<button class="ctx-item" data-ctx="whats-here">${t("whats_here")}</button>` +
+    `<button class="ctx-item" data-ctx="directions">${t("directions_here")}</button>` +
+    `<button class="ctx-item" data-ctx="share">${t("share_location")}</button>` +
+    `<button class="ctx-item" data-ctx="copy-code">${t("copy_code")}</button>`;
   menu.hidden = false;
   const rect = menu.getBoundingClientRect();
   const mw = rect.width || 210, mh = rect.height || 230;
@@ -708,7 +707,7 @@ $("#context-menu").addEventListener("click", async (e) => {
   hideContextMenu();
   if (act === "copy-coords") {
     const ok = await copyText(coordsString(lat, lon));
-    showToast(ok ? "Coordinates copied" : "Couldn't copy");
+    showToast(ok ? t("toast_coords_copied") : t("toast_cant_copy"));
   } else if (act === "whats-here") {
     selectPoint(lat, lon, { source: "map" });
   } else if (act === "directions") {
@@ -719,12 +718,12 @@ $("#context-menu").addEventListener("click", async (e) => {
     shareCurrentPlace();
   } else if (act === "copy-code") {
     const country = detectCountry(lat, lon);
-    if (!country) { showToast("Outside supported area"); return; }
+    if (!country) { showToast(t("toast_outside_supported")); return; }
     try {
       const enc = encode(lat, lon, country);
       const ok = await copyText(`${country}/${enc.code}`);
-      showToast(ok ? "Code copied" : "Couldn't copy");
-    } catch { showToast("Couldn't make a code there"); }
+      showToast(ok ? t("toast_code_copied") : t("toast_cant_copy"));
+    } catch { showToast(t("toast_cant_code_there")); }
   }
 });
 
@@ -747,7 +746,7 @@ async function runSearch(q) {
     url += `&viewbox=${b.getWest()},${b.getNorth()},${b.getEast()},${b.getSouth()}`;
   } catch {}
   try {
-    const res = await fetch(url, { headers: { "Accept-Language": "en" } });
+    const res = await fetch(url, { headers: { "Accept-Language": getLang() } });
     if (!res.ok || seq !== searchSeq) return;
     const data = await res.json();
     if (seq !== searchSeq) return;
@@ -830,16 +829,16 @@ const actions = {
     const loc = state.location;
     if (!loc) return;
     const ok = await copyText(`${loc.country}/${loc.code}`);
-    showToast(ok ? "Code copied" : "Couldn't copy");
+    showToast(ok ? t("toast_code_copied") : t("toast_cant_copy"));
   },
   "share-link": () => shareMineLink(),
   "copy-link": async () => {
     const ok = await copyText(mineState.shareUrl || "");
-    showToast(ok ? "Link copied" : "Couldn't copy");
+    showToast(ok ? t("toast_link_copied") : t("toast_cant_copy"));
   },
   "copy-code": async () => {
     const ok = await copyText(`${mineState.country}/${mineState.code}`);
-    showToast(ok ? "Code copied" : "Couldn't copy");
+    showToast(ok ? t("toast_code_copied") : t("toast_cant_copy"));
   },
   install: async () => {
     if (!deferredInstallPrompt) return;
@@ -866,11 +865,11 @@ document.addEventListener("click", (e) => {
 
 // "Locate me": fetch GPS and select the user's current point (drop a pin + code).
 function locateMe() {
-  if (!navigator.geolocation) { showToast("Location isn't available on this device"); return; }
-  showToast("Locating you…");
+  if (!navigator.geolocation) { showToast(t("toast_loc_unavailable")); return; }
+  showToast(t("toast_locating"));
   navigator.geolocation.getCurrentPosition(
     (pos) => selectPoint(pos.coords.latitude, pos.coords.longitude, { source: "gps", fly: true }),
-    () => showToast("Enable location to use this"),
+    () => showToast(t("toast_enable_use")),
     { enableHighAccuracy: true, timeout: 8000 }
   );
 }
@@ -939,13 +938,13 @@ function persistSavedNotes(arr) {
 function mountNoteManager(container, onChange) {
   if (!container) return null;
   container.innerHTML =
-    '<div class="note-mgr-tag">Add a private note (optional)</div>' +
+    '<div class="note-mgr-tag">' + t("note_tag") + '</div>' +
     '<input class="note-mgr-input" type="text" maxlength="80" autocomplete="off" ' +
-      'placeholder="e.g. Gate on the left, past the blue house">' +
+      'placeholder="' + t("note_ph") + '">' +
     '<div class="note-mgr-chips"></div>' +
     '<div class="note-mgr-row">' +
-      '<button type="button" class="note-mgr-save">Save for reuse</button>' +
-      '<span class="note-mgr-help">Saved on this device — pick a different note per person.</span>' +
+      '<button type="button" class="note-mgr-save">' + t("note_save") + '</button>' +
+      '<span class="note-mgr-help">' + t("note_help") + '</span>' +
     '</div>';
   const input = container.querySelector(".note-mgr-input");
   const chips = container.querySelector(".note-mgr-chips");
@@ -957,20 +956,20 @@ function mountNoteManager(container, onChange) {
       const short = n.body.length > 22 ? n.body.slice(0, 22) + "…" : n.body;
       return '<span class="note-chip">' +
         '<button type="button" class="note-chip-apply" data-id="' + n.id + '">' + escapeHtml(short) + '</button>' +
-        '<button type="button" class="note-chip-del" data-id="' + n.id + '" aria-label="Delete saved note">×</button>' +
+        '<button type="button" class="note-chip-del" data-id="' + n.id + '" aria-label="' + t("note_del_aria") + '">×</button>' +
         '</span>';
     }).join("");
   }
   input.addEventListener("input", emit);
   saveBtn.addEventListener("click", () => {
     const body = input.value.trim().slice(0, NOTE_MAX);
-    if (!body) { showToast("Type a note first"); return; }
+    if (!body) { showToast(t("toast_type_note")); return; }
     const notes = loadSavedNotes();
-    if (notes.some((n) => n.body === body)) { showToast("Already saved"); return; }
+    if (notes.some((n) => n.body === body)) { showToast(t("toast_already_saved")); return; }
     notes.unshift({ id: Date.now().toString(36), body });
     persistSavedNotes(notes);
     renderChips();
-    showToast("Note saved");
+    showToast(t("toast_note_saved"));
   });
   chips.addEventListener("click", (e) => {
     const apply = e.target.closest(".note-chip-apply");
@@ -1000,7 +999,19 @@ const selNoteMgr = mountNoteManager($("#sel-note-manager"), (text) => {
 });
 
 /* ── Boot ─────────────────────────────────────────────────── */
+function setupLangToggle() {
+  const btn = document.getElementById("lang-toggle");
+  if (!btn) return;
+  btn.textContent = getLang() === "es" ? "EN" : "ES";  // shows the language you switch TO
+  btn.addEventListener("click", () => {
+    setLang(getLang() === "es" ? "en" : "es");
+    location.reload();
+  });
+}
+
 function boot() {
+  applyStaticI18n();
+  setupLangToggle();
   initMap();
 
   const fromLink = parseSharedLink(location.search);

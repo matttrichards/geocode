@@ -9,7 +9,7 @@
 import {
   encode, decode, estimatePrecision, detectCountry,
   getBBox, BBOXES, COUNTRY_NAMES, ALPHABET,
-} from "./codec.js?v=105";
+} from "./codec.js?v=106";
 
 /* ── Preferences (localStorage) ───────────────────────────── */
 const PREF_KEY = "geo7-prefs";
@@ -654,7 +654,8 @@ async function selectPoint(lat, lon, { source = "map", fly = false } = {}) {
 
   setCodePrefixes(country);
   $("#sel-code").textContent = enc.code;
-  $("#sel-kicker").textContent = source === "search" ? "Search result" : "Dropped pin";
+  $("#sel-kicker").textContent =
+    source === "search" ? "Search result" : source === "gps" ? "Your location" : "Dropped pin";
   $("#sel-title").textContent = loc.coords;
   $("#sel-title").hidden = false;
   $("#sel-region").hidden = true;
@@ -863,9 +864,22 @@ document.addEventListener("click", (e) => {
   if (fn) { e.preventDefault(); fn(target); }
 });
 
+// "Locate me": fetch GPS and select the user's current point (drop a pin + code).
+function locateMe() {
+  if (!navigator.geolocation) { showToast("Location isn't available on this device"); return; }
+  showToast("Locating you…");
+  navigator.geolocation.getCurrentPosition(
+    (pos) => selectPoint(pos.coords.latitude, pos.coords.longitude, { source: "gps", fly: true }),
+    () => showToast("Enable location to use this"),
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+}
+
+// Crosshair button: recenter on the active pin if there is one, otherwise locate the user.
 $("#recenter-btn").addEventListener("click", () => {
   const loc = state.location || (mineState.lat != null ? mineState : null);
-  if (loc && loc.lat != null) map.setView([loc.lat, loc.lon], 16, { animate: true });
+  if (loc && loc.lat != null) { map.setView([loc.lat, loc.lon], 16, { animate: true }); return; }
+  locateMe();
 });
 
 $("#layer-toggle").addEventListener("click", toggleLayer);

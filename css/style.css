@@ -222,6 +222,12 @@ html, body {
 }
 .btn-caption-left { text-align: left; margin-top: 7px; }
 
+.feedback-link {
+  display: block; text-align: center; margin-top: 16px;
+  font-size: 12.5px; font-weight: 700; color: var(--text-faint); text-decoration: none;
+}
+.feedback-link:active { color: var(--text-dim); }
+
 .btn-secondary {
   width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
   background: var(--surface-btn); border: 1px solid var(--border); border-radius: 14px;

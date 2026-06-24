@@ -1,6 +1,6 @@
-# geo7 — short, shareable location codes
+# geocode — short, shareable location codes
 
-A geo7 code turns a precise point on Earth into a short, human-shareable string
+A geocode code turns a precise point on Earth into a short, human-shareable string
 like `CR/h3xex8`, and back — with **no server, no database, and no central
 authority**. The mapping is a pure function of published constants, so anyone can
 compute the same codes offline, in any language, or on paper.
@@ -64,7 +64,7 @@ future change requires a new version under a new namespace (SPEC §9).
 
 ## Prior art
 
-geo7 is in the family of open, deterministic geocoding grids. The closest is
+geocode is in the family of open, deterministic geocoding grids. The closest is
 Google's [Open Location Code / Plus Codes](https://github.com/google/open-location-code)
 (Apache-2.0). See SPEC §10 for an honest comparison.
 

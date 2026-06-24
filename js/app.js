@@ -9,8 +9,8 @@
 import {
   encode, decode, estimatePrecision, detectCountry,
   getBBox, BBOXES, COUNTRY_NAMES, ALPHABET,
-} from "./codec.js?v=109";
-import { t, getLang, setLang, applyStaticI18n } from "./i18n.js?v=109";
+} from "./codec.js?v=110";
+import { t, getLang, setLang, applyStaticI18n } from "./i18n.js?v=110";
 
 /* ── Preferences (localStorage) ───────────────────────────── */
 const PREF_KEY = "geo7-prefs";
@@ -1006,19 +1006,8 @@ function setFeedbackLinks() {
   document.querySelectorAll("a.feedback-link").forEach((a) => { a.href = FEEDBACK_FORM + val; });
 }
 
-function setupLangToggle() {
-  const btn = document.getElementById("lang-toggle");
-  if (!btn) return;
-  btn.textContent = getLang() === "es" ? "EN" : "ES";  // shows the language you switch TO
-  btn.addEventListener("click", () => {
-    setLang(getLang() === "es" ? "en" : "es");
-    location.reload();
-  });
-}
-
 function boot() {
   applyStaticI18n();
-  setupLangToggle();
   setFeedbackLinks();
   initMap();
 

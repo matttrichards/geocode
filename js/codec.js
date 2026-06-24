@@ -10,7 +10,7 @@
  * This file is the ALGORITHM only; the data is frozen. See docs/SPEC.md.
  */
 
-import { BBOXES, CELLS, COUNTRY_NAMES } from "./regions.gen.js?v=109";
+import { BBOXES, CELLS, COUNTRY_NAMES } from "./regions.gen.js?v=110";
 
 const ALPHABET = "0123456789cdefhjkmnpqrtuvwxy";
 const BASE = 28;

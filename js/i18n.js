@@ -162,7 +162,9 @@ function detectLang() {
   return nav.startsWith("es") ? "es" : "en";
 }
 
-let LANG = detectLang();
+// English-only: the app ships a single language and lets users' own device /
+// browser translators handle anything else (no in-app toggle, no auto-detect).
+let LANG = "en";
 
 function getLang() { return LANG; }
 

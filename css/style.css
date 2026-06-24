@@ -1,31 +1,41 @@
 /* ============================================================
-   geo7 — streamlined "code → directions" UI
-   Design tokens per handoff. UI font: Nunito. Mono: Space Mono.
+   Geoloc — "code → directions" UI · Cobalt v1
+   UI font: Hanken Grotesk. Mono (codes/coords/links): DM Mono.
+   Palette: Cobalt (primary), Coral (pin/accent), Mint (located),
+   Ink (text), Cloud (tint), Paper (warm background).
    ============================================================ */
 
 :root {
-  --bg:            #0c120f;  /* screen + map base */
-  --surface:       #121714;  /* bottom sheet, overlays */
-  --surface-raised:#1a201c;  /* provider cards */
-  --surface-input: #0c120f;  /* input/launcher/link fields */
-  --surface-btn:   #202620;  /* secondary buttons */
-  --border:        #2a3530;  /* hairlines/borders */
-  --green:         #0d4f3c;  /* primary buttons */
-  --green-accent:  #167a5e;  /* kickers, highlights, active border, GPS dot */
-  --amber:         #f59e0b;  /* code prefix, pin, warnings, install */
-  --amber-on:      #111813;  /* text on amber */
-  --text:          #e8f0ed;  /* primary text */
-  --text-dim:      #8a9a94;  /* secondary text */
-  --text-faint:    #5e6a64;  /* captions */
-  --note:          #cfe0da;  /* sender note / link text */
-  --pin-center:    #072e22;  /* pin inner dot */
-  --slash:         #3a4640;  /* code slash + placeholder slash */
+  /* Brand palette */
+  --paper:  #F7F5F0;   /* warm background (not stark white) */
+  --cloud:  #E7ECFD;   /* cobalt tint */
+  --ink:    #1C2230;   /* darkest surface / text */
+  --cobalt: #2F54EB;   /* primary · trust, structure, the system */
+  --coral:  #FF6A4D;   /* accent · the pin, one warm highlight */
+  --mint:   #15B98A;   /* located / confirmed */
+
+  --bg:            #F7F5F0;  /* screen + map base (Paper) */
+  --surface:       #FFFFFF;  /* bottom sheet, overlays */
+  --surface-raised:#F1F3FB;  /* provider cards, hover */
+  --surface-input: #F3F4F8;  /* input/launcher/link fields */
+  --surface-btn:   #E7ECFD;  /* secondary buttons (Cloud) */
+  --border:        #E4E3DB;  /* hairlines/borders */
+  --green:         #2F54EB;  /* primary buttons (Cobalt) */
+  --green-accent:  #2F54EB;  /* kickers, active border, focus (Cobalt) */
+  --amber:         #FF6A4D;  /* code prefix, pin, highlight, install (Coral) */
+  --amber-on:      #FFFFFF;  /* text on coral */
+  --text:          #1C2230;  /* primary text (Ink) */
+  --text-dim:      #5A6472;  /* secondary text */
+  --text-faint:    #97A0AD;  /* captions */
+  --note:          #283042;  /* sender note / link text */
+  --pin-center:    #FFFFFF;  /* pin inner dot (white hole) */
+  --slash:         #B7BECC;  /* code slash + placeholder slash */
   --google-blue:   #1a73e8;
   --waze-cyan:     #33ccff;
-  --backdrop:      rgba(0,0,0,.55);
+  --backdrop:      rgba(28,34,48,.45);
 
-  --font-ui: 'Nunito', -apple-system, system-ui, sans-serif;
-  --font-mono: 'Space Mono', ui-monospace, monospace;
+  --font-ui: 'Hanken Grotesk', -apple-system, system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -52,7 +62,7 @@ html, body {
 .leaflet-container { background: var(--bg); font-family: var(--font-ui); }
 /* Keep Leaflet attribution present but unobtrusive. */
 .leaflet-control-attribution {
-  background: rgba(12,18,15,.6) !important;
+  background: rgba(247,245,240,.75) !important;
   color: var(--text-faint) !important;
   font-size: 10px;
 }
@@ -71,7 +81,7 @@ html, body {
   border-radius: 50% 50% 50% 0;
   transform: translate(-50%,-50%) rotate(-45deg);
   background: var(--amber); border: 3px solid #fff;
-  box-shadow: 0 4px 14px rgba(0,0,0,.5);
+  box-shadow: 0 6px 16px rgba(28,34,48,.3);
   animation: g7-drop .5s cubic-bezier(.2,.8,.2,1);
 }
 .g7-pin .g7-pin-dot {
@@ -90,25 +100,25 @@ html, body {
 #top-chrome > * { pointer-events: auto; }
 .wordmark {
   display: flex; align-items: center; gap: 8px;
-  background: rgba(18,23,20,0.82); backdrop-filter: blur(14px);
+  background: rgba(255,255,255,0.85); backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border); border-radius: 11px;
-  padding: 9px 14px; box-shadow: 0 6px 20px rgba(0,0,0,.3);
+  padding: 9px 14px; box-shadow: 0 6px 18px rgba(28,34,48,.12);
 }
 .wordmark-badge {
   display: inline-flex; align-items: center; justify-content: center;
   width: 22px; height: 22px; border-radius: 50%;
-  background: var(--green); color: #fff;
-  font-family: var(--font-mono); font-weight: 700; font-size: 14px;
+  background: var(--coral); color: #fff;
+  font-family: var(--font-mono); font-weight: 500; font-size: 14px;
 }
 .wordmark-text { font-weight: 800; font-size: 16px; letter-spacing: -.2px; }
 .chrome-btn {
   display: flex; align-items: center; justify-content: center;
   width: 44px; height: 44px;
-  background: rgba(18,23,20,0.82); backdrop-filter: blur(14px);
+  background: rgba(255,255,255,0.85); backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border); border-radius: 12px;
-  color: var(--text); box-shadow: 0 6px 20px rgba(0,0,0,.3); cursor: pointer;
+  color: var(--text); box-shadow: 0 6px 18px rgba(28,34,48,.12); cursor: pointer;
 }
 .chrome-btn:active { transform: scale(.96); }
 .chrome-btn.active { color: var(--amber); border-color: var(--amber); }
@@ -120,7 +130,7 @@ html, body {
   background: var(--surface);
   border-top: 1px solid var(--border);
   border-radius: 22px 22px 0 0;
-  box-shadow: 0 -8px 40px rgba(0,0,0,.5);
+  box-shadow: 0 -8px 40px rgba(28,34,48,.16);
   padding: 10px 20px calc(30px + env(safe-area-inset-bottom, 0px));
   transition: transform .3s cubic-bezier(.2,.8,.2,1);
   will-change: transform;
@@ -139,7 +149,7 @@ html, body {
   touch-action: none;
 }
 #sheet > .grab-handle:active { cursor: grabbing; }
-#sheet.sheet-collapsed { box-shadow: 0 -8px 40px rgba(0,0,0,.6); }
+#sheet.sheet-collapsed { box-shadow: 0 -8px 40px rgba(28,34,48,.2); }
 #sheet.sheet-collapsed > .grab-handle { background: var(--text-faint); }
 .view { animation: g7-rise .3s ease; }
 
@@ -151,13 +161,13 @@ html, body {
   font-size: 11px; font-weight: 800; letter-spacing: 1.2px;
   text-transform: uppercase;
 }
-.kicker-green { color: var(--green-accent); }
+.kicker-green { color: var(--mint); }
 .kicker-dim { color: var(--text-dim); }
 .gps-kicker { display: inline-flex; align-items: center; gap: 6px; letter-spacing: 1px; }
 .gps-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: var(--green-accent);
-  box-shadow: 0 0 0 3px rgba(22,122,94,0.25);
+  background: var(--mint);
+  box-shadow: 0 0 0 3px rgba(21,185,138,0.25);
 }
 .close-x {
   flex-shrink: 0; display: flex; align-items: center; justify-content: center;
@@ -175,7 +185,7 @@ html, body {
 
 .note-callout {
   display: flex; gap: 8px; align-items: flex-start;
-  background: rgba(22,122,94,0.12); border: 1px solid rgba(22,122,94,0.3);
+  background: rgba(21,185,138,0.12); border: 1px solid rgba(21,185,138,0.30);
   border-radius: 12px; padding: 10px 12px; margin-top: 12px;
 }
 .note-callout svg { flex-shrink: 0; margin-top: 1px; }
@@ -184,7 +194,7 @@ html, body {
 /* Code line (CR / code) — size varies per view */
 .code-line {
   display: flex; align-items: baseline; gap: 2px;
-  font-family: var(--font-mono); font-weight: 700;
+  font-family: var(--font-mono); font-weight: 500;
 }
 .code-prefix { color: var(--amber); }
 .code-slash  { color: var(--slash); margin: 0 3px; }
@@ -202,7 +212,7 @@ html, body {
   width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
   background: var(--green); border: none; border-radius: 14px; color: #fff;
   font-size: 17px; font-weight: 800; padding: 17px; margin-top: 18px;
-  cursor: pointer; box-shadow: 0 8px 24px rgba(13,79,60,.5);
+  cursor: pointer; box-shadow: 0 8px 22px rgba(47,84,235,.26);
 }
 .btn-primary:active { transform: scale(.99); }
 .btn-primary-sm { font-size: 16px; padding: 15px; margin-top: 18px; box-shadow: none; }
@@ -232,7 +242,7 @@ html, body {
 #view-notfound { text-align: center; padding: 6px 4px 2px; }
 .notfound-icon {
   width: 52px; height: 52px; margin: 0 auto; border-radius: 50%;
-  background: rgba(245,158,11,0.14);
+  background: rgba(255,106,77,0.14);
   display: flex; align-items: center; justify-content: center;
 }
 .notfound-title { font-size: 19px; font-weight: 800; margin-top: 14px; }
@@ -244,7 +254,7 @@ html, body {
   background: var(--surface-input); border: 1.5px solid var(--border);
   border-radius: 16px; padding: 16px; cursor: pointer; text-align: left; color: var(--text);
 }
-.launcher .code-prefix { font-family: var(--font-mono); font-size: 20px; font-weight: 700; }
+.launcher .code-prefix { font-family: var(--font-mono); font-size: 20px; font-weight: 500; }
 .launcher .code-slash  { font-family: var(--font-mono); font-size: 20px; }
 .launcher-placeholder { flex: 1; min-width: 0; font-size: 16px; font-weight: 600; color: var(--text-dim); }
 .helper-line { font-size: 13px; color: var(--text-dim); line-height: 1.45; margin-top: 12px; }
@@ -279,7 +289,7 @@ html, body {
 
 .install-nudge {
   display: flex; align-items: center; gap: 11px;
-  background: rgba(245,158,11,0.10); border: 1px solid rgba(245,158,11,0.28);
+  background: rgba(255,106,77,0.10); border: 1px solid rgba(255,106,77,0.28);
   border-radius: 12px; padding: 11px 12px; margin-top: 14px;
 }
 .install-nudge svg { flex-shrink: 0; }
@@ -340,7 +350,7 @@ html, body {
   background: var(--surface); border-top: 1px solid var(--border);
   border-radius: 22px 22px 0 0;
   padding: 10px 20px calc(30px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -8px 40px rgba(0,0,0,.6);
+  box-shadow: 0 -8px 40px rgba(28,34,48,.2);
   animation: g7-rise .28s cubic-bezier(.2,.8,.2,1);
 }
 
@@ -362,11 +372,11 @@ html, body {
   border-radius: 14px; padding: 16px;
 }
 .entry-input-row.error { border-color: var(--amber); }
-.entry-input-row .code-prefix { font-family: var(--font-mono); font-size: 28px; font-weight: 700; }
+.entry-input-row .code-prefix { font-family: var(--font-mono); font-size: 28px; font-weight: 500; }
 .entry-input-row .code-slash  { font-family: var(--font-mono); font-size: 28px; }
 #code-input {
   flex: 1; min-width: 0; background: transparent; border: none; outline: none;
-  color: var(--text); font-family: var(--font-mono); font-size: 28px; font-weight: 700;
+  color: var(--text); font-family: var(--font-mono); font-size: 28px; font-weight: 500;
   letter-spacing: 1px;
 }
 #code-input::placeholder { color: var(--slash); }
@@ -405,7 +415,7 @@ html, body {
   display: inline-flex; align-items: center; justify-content: center;
   width: 46px; height: 46px; border-radius: 13px;
 }
-.provider-icon-google { background: #fff; }
+.provider-icon-google { background: #fff; border: 1px solid var(--border); }
 .provider-icon-waze { background: var(--waze-cyan); }
 .provider-label { font-size: 15px; font-weight: 800; }
 
@@ -433,10 +443,10 @@ html, body {
 .search-bar {
   flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
   height: 44px; padding: 0 8px 0 12px; margin-right: 10px;
-  background: rgba(18,23,20,0.92); backdrop-filter: blur(14px);
+  background: rgba(255,255,255,0.90); backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border); border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,.3);
+  box-shadow: 0 6px 18px rgba(28,34,48,.12);
 }
 .search-bar .wordmark-badge { flex-shrink: 0; }
 #address-input {
@@ -454,7 +464,7 @@ html, body {
   position: absolute; z-index: 35; left: 16px; right: 16px;
   top: calc(env(safe-area-inset-top, 0px) + 12px + 52px);
   background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.5);
+  box-shadow: 0 12px 30px rgba(28,34,48,.16);
   overflow: hidden auto; max-height: 46vh;
 }
 .search-result {
@@ -471,12 +481,12 @@ html, body {
 .context-menu {
   position: fixed; z-index: 70; min-width: 210px; padding: 4px;
   background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.55);
+  box-shadow: 0 12px 30px rgba(28,34,48,.18);
   animation: g7-fade .12s ease;
 }
 .ctx-coords {
   display: block; width: 100%; text-align: left; background: transparent; border: none;
-  color: var(--text); font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+  color: var(--text); font-family: var(--font-mono); font-size: 13px; font-weight: 500;
   padding: 8px 10px; margin-bottom: 2px; cursor: pointer; border-radius: 8px;
   border-bottom: 1px solid var(--border);
 }
@@ -490,9 +500,9 @@ html, body {
 /* ── Toast ─────────────────────────────────────────────── */
 .toast {
   position: fixed; left: 50%; bottom: 320px; transform: translateX(-50%) translateY(8px);
-  z-index: 60; background: var(--pin-center); color: #fff;
+  z-index: 60; background: var(--ink); color: #fff;
   padding: 11px 20px; border-radius: 10px; font-size: 14px; font-weight: 700;
-  box-shadow: 0 10px 30px rgba(0,0,0,.4); white-space: nowrap;
+  box-shadow: 0 10px 30px rgba(28,34,48,.28); white-space: nowrap;
   opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease;
 }
 .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }

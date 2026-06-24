@@ -9,7 +9,7 @@
 import {
   encode, decode, estimatePrecision, detectCountry,
   getBBox, BBOXES, COUNTRY_NAMES, ALPHABET,
-} from "./codec.js?v=104";
+} from "./codec.js?v=105";
 
 /* ── Preferences (localStorage) ───────────────────────────── */
 const PREF_KEY = "geo7-prefs";
@@ -493,7 +493,7 @@ codeInput.addEventListener("input", (e) => {
   if (raw !== e.target.value) e.target.value = raw;
   const req = estimatePrecision(currentCountry)?.numChars || 6;
   if ([...raw].some((ch) => !ALPHABET.includes(ch))) {
-    setEntryError("That code has characters geo7 doesn't use.");
+    setEntryError("That code has characters Geoloc doesn't use.");
     return;
   }
   setEntryError("");
@@ -588,7 +588,7 @@ async function shareMineLink() {
   const url = mineState.shareUrl;
   if (!url) return;
   if (navigator.share) {
-    try { await navigator.share({ title: "geo7 location", url }); return; }
+    try { await navigator.share({ title: "Geoloc location", url }); return; }
     catch { /* user cancelled or unsupported → fall through */ }
   }
   const ok = await copyText(url);
@@ -629,7 +629,7 @@ async function shareCurrentPlace() {
   const url = currentShareUrl();
   if (!url) return;
   if (navigator.share) {
-    try { await navigator.share({ title: "geo7 location", url }); return; }
+    try { await navigator.share({ title: "Geoloc location", url }); return; }
     catch { /* cancelled / unsupported → fall through to copy */ }
   }
   const ok = await copyText(url);
@@ -687,7 +687,7 @@ function openContextMenu(lat, lon, x, y) {
     `<button class="ctx-item" data-ctx="whats-here">What's here?</button>` +
     `<button class="ctx-item" data-ctx="directions">Directions to here</button>` +
     `<button class="ctx-item" data-ctx="share">Share this location</button>` +
-    `<button class="ctx-item" data-ctx="copy-code">Copy geo7 code</button>`;
+    `<button class="ctx-item" data-ctx="copy-code">Copy code</button>`;
   menu.hidden = false;
   const rect = menu.getBoundingClientRect();
   const mw = rect.width || 210, mh = rect.height || 230;

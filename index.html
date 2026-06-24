@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0c120f">
+  <meta name="theme-color" content="#F7F5F0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>geo7</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Geoloc</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%230d4f3c'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='monospace'>7</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%232F54EB'/><path d='M50 22c-13 0-23 10-23 23 0 17 23 33 23 33s23-16 23-33c0-13-10-23-23-23z' fill='white'/><circle cx='50' cy='45' r='8.5' fill='%232F54EB'/></svg>">
 
-  <!-- Fonts: Nunito (UI) + Space Mono (codes/links) -->
+  <!-- Fonts: Hanken Grotesk (UI) + DM Mono (codes/coords/links) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="css/style.css?v=104">
+  <link rel="stylesheet" href="css/style.css?v=105">
 </head>
 <body>
   <div id="app">
@@ -27,7 +27,7 @@
     <!-- Top chrome: search/address bar (left) + recenter (right) -->
     <div id="top-chrome">
       <div class="search-bar">
-        <span class="wordmark-badge" title="geo7">7</span>
+        <span class="wordmark-badge" title="Geoloc">G</span>
         <input id="address-input" type="text" placeholder="Search a place or tap the map" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search a place or address">
         <button id="address-clear" class="address-clear" type="button" aria-label="Clear search" hidden>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -59,7 +59,7 @@
         <h1 id="res-title" class="place-title"></h1>
         <div id="res-region" class="place-region"></div>
         <div id="res-note" class="note-callout" hidden>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#167a5e" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15B98A" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
           <span id="res-note-text"></span>
         </div>
         <div class="code-line code-line-lg">
@@ -94,7 +94,7 @@
       <!-- STATE: NOT FOUND — broken / expired / unsupported -->
       <section id="view-notfound" class="view" hidden>
         <div class="notfound-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF6A4D" stroke-width="2.2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
         </div>
         <div class="notfound-title">We couldn't open that link</div>
         <div class="notfound-detail">The code may be mistyped, expired, or outside a supported area. Double-check it with whoever shared it.</div>
@@ -108,9 +108,9 @@
           <span class="code-prefix" data-code-prefix>CR</span>
           <span class="code-slash">/</span>
           <span class="launcher-placeholder">Enter a code</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5e6a64" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#97A0AD" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg>
         </button>
-        <div class="helper-line">Most geo7 links open straight to the place. Type a code here if you got it on a sign, a card, or by phone.</div>
+        <div class="helper-line">Most Geoloc links open straight to the place. Type a code here if you got it on a sign, a card, or by phone.</div>
         <div class="or-divider"><span class="or-rule"></span><span class="or-label">OR</span><span class="or-rule"></span></div>
         <button class="btn-secondary" data-action="share-mine">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.4 8 12 8 12s8-6.6 8-12a8 8 0 0 0-8-8Z"/></svg>
@@ -137,7 +137,7 @@
         <div id="mine-note-manager" class="note-manager"></div>
 
         <div class="link-field">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5e6a64" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97A0AD" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
           <span id="mine-link" class="link-text"></span>
         </div>
         <div class="btn-caption btn-caption-left">Send the link — it opens the place in any browser, no app required.</div>
@@ -152,8 +152,8 @@
         </div>
 
         <div id="install-nudge" class="install-nudge" hidden>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
-          <span class="install-text">Share spots often? Add geo7 to your home screen.</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF6A4D" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+          <span class="install-text">Share spots often? Add Geoloc to your home screen.</span>
           <button class="install-add" data-action="install">Add</button>
           <button class="install-dismiss" data-action="dismiss-install" aria-label="Dismiss">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -194,7 +194,7 @@
       <div class="overlay-backdrop" data-action="close-entry"></div>
       <div class="overlay-panel">
         <div class="grab-handle"></div>
-        <div class="kicker kicker-dim entry-kicker">Enter a geo7 code</div>
+        <div class="kicker kicker-dim entry-kicker">Enter a Geoloc code</div>
         <label class="entry-region-row">Region
           <select id="entry-region" class="entry-region" aria-label="Region"></select>
         </label>
@@ -217,7 +217,7 @@
 
         <div class="dest-chip">
           <span class="dest-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#072e22" stroke-width="2.6"><circle cx="12" cy="10" r="2.5"/><path d="M12 2a8 8 0 0 0-8 8c0 5.4 8 12 8 12s8-6.6 8-12a8 8 0 0 0-8-8Z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.6"><circle cx="12" cy="10" r="2.5"/><path d="M12 2a8 8 0 0 0-8 8c0 5.4 8 12 8 12s8-6.6 8-12a8 8 0 0 0-8-8Z"/></svg>
           </span>
           <div class="dest-text">
             <div id="handoff-title-text" class="dest-title"></div>
@@ -254,6 +254,6 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script type="module" src="js/app.js?v=104"></script>
+  <script type="module" src="js/app.js?v=105"></script>
 </body>
 </html>

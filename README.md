@@ -5,8 +5,11 @@ Feel free to build your own UI!
 This is useful when:
 
 A delivery driver who isn't from your barrio can't find you, so the package goes back.
+
 An online store's form demands an "address" that doesn't exist.
+
 Someone's hurt and you're trying to get the Cruz Roja to a place with no sign and no number.
+
 A friend circles the same three blocks looking for your gate.
 
 A geoloc turns a precise point on Earth into a short, human-shareable string

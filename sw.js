@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
-const CACHE_NAME = "geoloc-v108";
+const CACHE_NAME = "geoloc-v109";
 const ASSETS = [
   "./",
   "./index.html",
-  "./css/style.css?v=108",
-  "./js/codec.js?v=108",
-  "./js/regions.gen.js?v=108",
-  "./js/i18n.js?v=108",
-  "./js/app.js?v=108",
+  "./css/style.css?v=109",
+  "./js/codec.js?v=109",
+  "./js/regions.gen.js?v=109",
+  "./js/i18n.js?v=109",
+  "./js/app.js?v=109",
   "./manifest.json",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",

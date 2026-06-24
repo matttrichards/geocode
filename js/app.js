@@ -9,8 +9,8 @@
 import {
   encode, decode, estimatePrecision, detectCountry,
   getBBox, BBOXES, COUNTRY_NAMES, ALPHABET,
-} from "./codec.js?v=108";
-import { t, getLang, setLang, applyStaticI18n } from "./i18n.js?v=108";
+} from "./codec.js?v=109";
+import { t, getLang, setLang, applyStaticI18n } from "./i18n.js?v=109";
 
 /* ── Preferences (localStorage) ───────────────────────────── */
 const PREF_KEY = "geo7-prefs";
@@ -999,6 +999,13 @@ const selNoteMgr = mountNoteManager($("#sel-note-manager"), (text) => {
 });
 
 /* ── Boot ─────────────────────────────────────────────────── */
+// Feedback form: prefill the Language field so each response is tagged EN/ES.
+const FEEDBACK_FORM = "https://docs.google.com/forms/d/e/1FAIpQLScSTHqOez8d1PPQreTF_gBXByykyI7-F0_3-IPTBUsxnNodMw/viewform?usp=pp_url&entry.523853697=";
+function setFeedbackLinks() {
+  const val = encodeURIComponent(getLang() === "es" ? "Español" : "English");
+  document.querySelectorAll("a.feedback-link").forEach((a) => { a.href = FEEDBACK_FORM + val; });
+}
+
 function setupLangToggle() {
   const btn = document.getElementById("lang-toggle");
   if (!btn) return;
@@ -1012,6 +1019,7 @@ function setupLangToggle() {
 function boot() {
   applyStaticI18n();
   setupLangToggle();
+  setFeedbackLinks();
   initMap();
 
   const fromLink = parseSharedLink(location.search);

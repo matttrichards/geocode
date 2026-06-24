@@ -1,4 +1,6 @@
 # geocode — short, shareable location codes
+You can play around with a simple UI I built for it here: https://geoloc.cc/
+Feel free to build your own UI!
 
 A geocode code turns a precise point on Earth into a short, human-shareable string
 like `h3xex8`, and back — with **no server, no database, and no central

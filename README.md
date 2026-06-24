@@ -1,9 +1,9 @@
-# geocode — short, shareable location codes
+# geoloc — short, shareable location codes
 You can play around with a simple UI I built for it here: https://geoloc.cc/
 
 Feel free to build your own UI!
 
-A geocode code turns a precise point on Earth into a short, human-shareable string
+A geoloc code turns a precise point on Earth into a short, human-shareable string
 like `h3xex8`, and back — with **no server, no database, and no central
 authority**. The mapping is a pure function of published constants, so anyone can
 compute the same codes offline, in any language, or on paper.
@@ -67,7 +67,7 @@ future change requires a new version under a new namespace (SPEC §9).
 
 ## Prior art
 
-geocode is in the family of open, deterministic geocoding grids. The closest is
+geoloc is in the family of open, deterministic geocoding grids. The closest is
 Google's [Open Location Code / Plus Codes](https://github.com/google/open-location-code)
 (Apache-2.0). See SPEC §10 for an honest comparison.
 
